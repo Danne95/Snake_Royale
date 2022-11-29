@@ -1,14 +1,15 @@
 import java.util.LinkedList;
+import java.awt.Color;
 
 public class Snake {
     private int length = 3;
-    private String color;
+    private Color color;
     private String headDir;
     private LinkedList<Point> body;
     private int potential = 0;
     private Map map;
     
-    public Snake(String color, LinkedList<Point> body, String headDir, Map map){
+    public Snake(App app, Color color, LinkedList<Point> body, String headDir, Map map){
         this.color = color;
         this.body = body;
         this.headDir = headDir;
@@ -26,26 +27,29 @@ public class Snake {
     public void moveRight(){
         System.out.println("moving right..");
         Point currHead = body.getFirst();
+        System.out.println("\t ??? " + currHead.getx());
+        System.out.println("\t ??? " + currHead.gety());
+        System.out.println("\t ??? " + map.getMapSize());
+        /////////////////////////////////////////////////////
         Point temp = new Point(currHead.getx(), (currHead.gety()+1)%map.getMapSize());
         body.addFirst(temp);
         map.setBlock(temp, color);
-        //snake moves
+        //snake moves forward
         if(potential == 0){
-            map.setBlock(body.getLast(), "e");
+            map.setBlock(body.getLast(), Color.LIGHT_GRAY);
             body.removeLast();
             
         }
-        //snake grows
+        //snake grows forward
         else{
             length++;
             potential--;
         }
-
         headDir = "Right";
     }
 
     public int getLength(){ return length;}
-    public String getColor(){ return color;}
+    public Color getColor(){ return color;}
     public LinkedList<Point> getBody(){ return body;}
     public Point getHead(){ return body.getFirst();}
     public String getheadDir(){ return headDir;}
