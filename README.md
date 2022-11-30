@@ -1,18 +1,23 @@
-## Getting Started
+welcome to Snake Royale !
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+The game is a simulation.
+Our world is also a simulation (maybe), so... what can we learn here?
+we'll see where the random leads us.
 
-## Folder Structure
+Jokes aside.
+this is a mini game of snakes moving randomly.
 
-The workspace contains two folders by default, where:
+features i currently plan on and working on:
+    GUI
+    Snakes
+    food/power-ups
+    PVP?
+    self preservation
+    snake victory rank
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+knowledge i plan or think to implement:
+    OOP
+    GUI
+    multi-thread/process
+    threadpool
+    decorator
