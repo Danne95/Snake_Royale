@@ -27,10 +27,6 @@ public class Snake {
     public void moveRight(){
         System.out.println("moving right..");
         Point currHead = body.getFirst();
-        System.out.println("\t ??? " + currHead.getx());
-        System.out.println("\t ??? " + currHead.gety());
-        System.out.println("\t ??? " + map.getMapSize());
-        /////////////////////////////////////////////////////
         Point temp = new Point(currHead.getx(), (currHead.gety()+1)%map.getMapSize());
         body.addFirst(temp);
         map.setBlock(temp, color);

@@ -26,7 +26,7 @@ public class App implements Utilities{
         System.out.println("\t\t\t\t\t\t\t\t\t***Hello, Welcome to 'App.java!'***");
         App app = new App();
         Game game = new Game(app, 7);
-        game.runSnakeRun(10);
+        game.runSnakeRun(18);
         System.out.println("\t\t\t\t\t\t\t\t\t\t***end of 'App.java!'***");
     }
 
