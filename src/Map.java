@@ -35,12 +35,12 @@ public class Map {
     public void placeSnake(Snake snake){
         for(int i=0; i<snake.getLength()+1; i++){
             Point temp = snake.getBody().get(i);
-            grid[temp.getx()][temp.gety()].setBackground(snake.getColor());
+            grid[temp.getx()][temp.gety()].updateBlock(snake.getColor(), Element.SNAKE);
         }
     }
 
-    public void setBlock(Point p, Color color){
-        grid[p.getx()][p.gety()].setBackground(color);
+    public void setBlock(Point p, Color color, Element element){
+        grid[p.getx()][p.gety()].updateBlock(color, element);
     }
 
     public App getApp(){return app;}
