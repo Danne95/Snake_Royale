@@ -25,8 +25,8 @@ public class App implements Utilities{
     public static void main(String[] args) throws Exception {
         System.out.println("\t\t\t\t\t\t\t\t\t***Hello, Welcome to 'App.java!'***");
         App app = new App();
-        Game game = new Game(app, 10, 1);
-        game.start(33);
+        Game game = new Game(app, 12, 1);
+        game.start(69);
         System.out.println("\t\t\t\t\t\t\t\t\t\t***end of 'App.java!'***");
     }
 

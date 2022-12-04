@@ -7,20 +7,22 @@ public class Point{
         this.y = y;
     }
 
+    @Override
+    public boolean equals(Object other){
+        Point o = (Point) other;
+		if (this.x==o.getx() && this.y==o.gety())
+			return true;
+		else 
+            return false;
+    }
+
+    public String toString(){
+        return "Point (" + x + ", " + y + ")";
+    }
+
     public int getx(){ return x;}
     public int gety(){ return y;}
 
     public void setx(int x){ this.x = x;}
     public void sety(int y){ this.y = y;}
-
-    public boolean equals(Point other) {
-		if (this.x==other.x && this.y==other.y)
-			return true;
-		else 
-            return false;
-	}
-
-    public String toString(){
-        return "Point (" + x + ", " + y + ")";
-    }
 }

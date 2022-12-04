@@ -32,7 +32,7 @@ public class Snake implements Utilities{
         for(int i=0; i<this.length; i++){
             this.body.add(new Point(xs[i], ys[i]));
         }
-        System.out.print("snake creation complete, " + this);
+        System.out.println("snake creation complete, " + this);
         map.placeSnake(this);
     }
 
@@ -46,7 +46,7 @@ public class Snake implements Utilities{
         int y = currHead.gety();
         int mapSize = map.getMapSize();
         Point options[] = new Point[4]; // N,E,S,W
-        int optionScore[] = new int[4];
+        int optionScores[] = new int[4];
 
         // potential points to move to
         options[0] = new Point((x+mapSize-1)% mapSize, y);      // north
@@ -58,17 +58,18 @@ public class Snake implements Utilities{
         for(int i=0; i<4 ;i++){
             // check if detected snake is self, if true, give score in relation to segment index
             if(body.contains(options[i])){
-                optionScore[i] = - length + body.indexOf(options[i]) - 1;
+                optionScores[i] = - (body.indexOf(options[i])+1) ;
             }
             // not self
             else{
-                optionScore[i] = map.getBlockElement(options[i]).getValue();
+                optionScores[i] = map.getBlockElement(options[i]).getValue();
             }
+            System.out.print(options[i] + " is " + optionScores[i] + " ");
         }
 
         // holds index for the next move chosen (0=north,...)
-        int bestMove = findBestDirection(optionScore);
-        System.out.println(body.getLast() + " >> " + options[bestMove] + "\t\t" + body);
+        int bestMove = findBestDirection(optionScores);
+        System.out.println("\n\t" + body.getLast() + " >> " + options[bestMove] + "\t" + body);
 
         body.add(options[bestMove]);
         map.setBlock(options[bestMove], color, Element.SNAKE);
@@ -83,17 +84,17 @@ public class Snake implements Utilities{
         }
     }
 
-    public int findBestDirection(int[] options){
-        int maxValue = options[0]; // will hold the highest value from options
+    public int findBestDirection(int[] optionScores){
+        int maxValue = optionScores[0]; // will hold the highest value from options
         List<Integer> maxIndexes = new ArrayList<>(); // holds indexes (0=north,...)
         for(int i=1; i<4; i++){
-            if(options[i] == options[maxValue]){
+            if(optionScores[i] == maxValue){
                 maxIndexes.add(i);
             }
-            else if(options[i] > options[maxValue]){
+            else if(optionScores[i] > maxValue){
                 maxIndexes.clear();
                 maxIndexes.add(i);
-                maxValue = i;
+                maxValue = optionScores[i];
             }
         }
         // if there are multiple best options, get a random one
