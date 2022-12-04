@@ -33,7 +33,7 @@ public class Map {
     }
 
     public void placeSnake(Snake snake){
-        for(int i=0; i<snake.getLength()+1; i++){
+        for(int i=0; i<snake.getLength(); i++){
             Point temp = snake.getBody().get(i);
             grid[temp.getx()][temp.gety()].updateBlock(snake.getColor(), Element.SNAKE);
         }
@@ -43,10 +43,12 @@ public class Map {
         grid[p.getx()][p.gety()].updateBlock(color, element);
     }
 
-    public App getApp(){return app;}
+    public App getApp(){ return app;}
     public int getMapSize(){ return mapSize;}
-    public Color getBlockColor(int i, int j){return grid[i][j].getColor();}
-    public MapBlock[][] getGrid(){return grid;}
+    public Color getBlockColor(int i, int j){ return grid[i][j].getColor();}
+    public Element getBlockElement(int i, int j){ return grid[i][j].getElement();}
+    public Element getBlockElement(Point point){ return grid[point.getx()][point.gety()].getElement();}
+    public MapBlock[][] getGrid(){ return grid;}
 
     public void printGrid(){
         for(int i=0; i< mapSize; i++){

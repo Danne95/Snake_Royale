@@ -1,0 +1,44 @@
+// snake creation
+    LinkedList<Point> s1body = new LinkedList<>();
+    Point p7 = new Point(3, 5);
+    Point p6 = new Point(3, 4);
+    Point p5 = new Point(2, 4);
+    Point p4 = new Point(2, 3);
+    Point p3 = new Point(1, 3);
+    Point p2 = new Point(1, 2);
+    Point p1 = new Point(1, 1);
+    Point p0 = new Point(0, 1);
+    s1body.add(p0);
+    s1body.add(p1);
+    s1body.add(p2);
+    s1body.add(p3);
+    s1body.add(p4);
+    s1body.add(p5);
+    s1body.add(p6);
+    s1body.add(p7);
+    Snake snake1 = new Snake(app, Color.GREEN.darker(), s1body, "east", map);
+
+// useless switch
+    switch(bestMove){
+    case(0):
+        nextHead = options[bestMove];
+        headDir = "north";
+        break;
+    case(1):
+        nextHead = options[bestMove];
+        headDir = "east";
+        break;
+    case(2):
+        nextHead = options[bestMove];
+        headDir = "south";
+        break;
+    case(3):
+        nextHead = options[bestMove];
+        headDir = "west";
+        break;
+    default:
+        //didn't move(huh??) >> stay in place and retain tail
+        System.out.println("snake didnt randomly didnt move, huh??");
+        potential +=1;
+        nextHead = currHead;
+    }

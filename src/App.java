@@ -23,11 +23,10 @@ public class App implements Utilities{
 
     // runner
     public static void main(String[] args) throws Exception {
-        System.out.println((0-1)%7);
         System.out.println("\t\t\t\t\t\t\t\t\t***Hello, Welcome to 'App.java!'***");
         App app = new App();
-        Game game = new Game(app, 7);
-        game.start(18);
+        Game game = new Game(app, 10, 1);
+        game.start(33);
         System.out.println("\t\t\t\t\t\t\t\t\t\t***end of 'App.java!'***");
     }
 

@@ -5,28 +5,18 @@ public class Game implements Utilities{
     private Map map;
     private LinkedList<Snake> players;
 
-    public Game(App app, int mapSize){
+    public Game(App app, int mapSize, int snakeAmount){
         System.out.println("building game...");
-
+        players = new LinkedList<Snake>();
 
         // map
         map = new Map(app, mapSize);
 
         // snake1
-        LinkedList<Point> s1body = new LinkedList<>();
-        Point p1 = new Point(1, 4);
-        Point p2 = new Point(1, 3);
-        Point p3 = new Point(1, 2);
-        Point p4 = new Point(1, 1);
-        s1body.add(p1);
-        s1body.add(p2);
-        s1body.add(p3);
-        s1body.add(p4);
-        Snake snake1 = new Snake(app, Color.GREEN.darker(), s1body, "east", map);
-        players = new LinkedList<Snake>();
+        int[] s1xs = {1,1,1,2,2,3,3};
+        int[] s1ys = {1,2,3,3,4,4,5};
+        Snake snake1 = new Snake(app, Color.GREEN.darker(), s1xs, s1ys, "east", map);
         players.add(snake1);
-        map.placeSnake(snake1);
-        System.out.println(snake1);
     }
 
     public void start(int turns){
@@ -34,7 +24,7 @@ public class Game implements Utilities{
         // bonus >> empty >> snake >> self
         for(int i=1; i<turns+1; i++){
             try{
-                Thread.sleep(500);
+                Thread.sleep(1000);
             }catch (InterruptedException ie){}
             System.out.print(i + ": ");
             players.getFirst().move();

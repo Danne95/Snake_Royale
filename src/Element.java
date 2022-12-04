@@ -1,7 +1,7 @@
 public enum Element {
-    VOID(0),
+    VOID(2),
     SNAKE(1),
-    APPLE(2);
+    APPLE(3);
 
     private int value;
 
