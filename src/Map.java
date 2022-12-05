@@ -16,7 +16,7 @@ public class Map {
 
         for(int i=0; i<mapSize; i++){
             for(int j=0; j<mapSize; j++){
-                grid[i][j] = new MapBlock(Color.GRAY);
+                grid[i][j] = new MapBlock(i, j, Color.GRAY);
                 grid[i][j].setMinimumSize(new java.awt.Dimension(dim));
                 grid[i][j].setPreferredSize(new java.awt.Dimension(dim));
                 grid[i][j].setMaximumSize(new java.awt.Dimension(dim));
@@ -26,10 +26,6 @@ public class Map {
             }
         }
         app.getFrame().pack();
-    }
-
-    public String toString(){
-        return "Printing Map object: ";
     }
 
     public void placeSnake(Snake snake){
@@ -46,9 +42,14 @@ public class Map {
     public App getApp(){ return app;}
     public int getMapSize(){ return mapSize;}
     public Color getBlockColor(int i, int j){ return grid[i][j].getColor();}
+    public Color getBlockColor(Point point){ return grid[point.getx()][point.gety()].getColor();}
     public Element getBlockElement(int i, int j){ return grid[i][j].getElement();}
     public Element getBlockElement(Point point){ return grid[point.getx()][point.gety()].getElement();}
     public MapBlock[][] getGrid(){ return grid;}
+
+    public String toString(){
+        return "Printing Map object: ";
+    }
 
     public void printGrid(){
         for(int i=0; i< mapSize; i++){

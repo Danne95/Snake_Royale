@@ -7,6 +7,16 @@ public class Point{
         this.y = y;
     }
 
+    public void setx(int x){ this.x = x;}
+    public void sety(int y){ this.y = y;}
+
+    public int getx(){ return x;}
+    public int gety(){ return y;}
+
+    public String toString(){
+        return "Point (" + x + ", " + y + ")";
+    }
+
     @Override
     public boolean equals(Object other){
         Point o = (Point) other;
@@ -15,14 +25,4 @@ public class Point{
 		else 
             return false;
     }
-
-    public String toString(){
-        return "Point (" + x + ", " + y + ")";
-    }
-
-    public int getx(){ return x;}
-    public int gety(){ return y;}
-
-    public void setx(int x){ this.x = x;}
-    public void sety(int y){ this.y = y;}
 }
