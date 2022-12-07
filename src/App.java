@@ -3,7 +3,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 
-public class App implements Utilities{
+public class App    {
     private JFrame frame;
     private JPanel panel;
 

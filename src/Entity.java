@@ -13,8 +13,10 @@ public abstract class Entity {
         this.alive = true;
     }
 
-    public void stopAlive(){
+
+    public void bitten(Point p){
         this.alive = false;
+        System.out.println("goodbye..");
     }
 
     public void setMainBlock(Point mainBlock){ this.mainBlock = mainBlock;}
@@ -23,4 +25,5 @@ public abstract class Entity {
     public Point getMainBlock(){ return mainBlock;}
     public Map getMap(){ return map;}
     public boolean getExists(){ return alive;}
+
 }

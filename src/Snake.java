@@ -33,14 +33,10 @@ public class Snake extends Entity implements Utilities{
     }
 
     public int move(){
-        if(this.getExists() == false){
-            System.out.println("snake with color " + this.getColor() + " is dead");
-            this.stopAlive();
-        }
         Point currHead = body.getLast();
         int x = currHead.getx();
         int y = currHead.gety();
-        int mapSize = super.getMap().getMapSize();
+        int mapSize = this.getMap().getMapSize();
         Point options[] = new Point[4]; // N,E,S,W
         int optionScores[] = new int[4];
 
@@ -50,7 +46,7 @@ public class Snake extends Entity implements Utilities{
         options[2] = new Point((x+1)% mapSize, y);              // south
         options[3] = new Point(x, (y+mapSize-1)% mapSize);      // west
 
-        // values for point options
+        // values for move options
         for(int i=0; i<4 ;i++){
             // check if detected snake is self, if true, give score in relation to segment index
             if(body.contains(options[i])){
@@ -58,7 +54,10 @@ public class Snake extends Entity implements Utilities{
             }
             // not self
             else{
-                optionScores[i] = super.getMap().getBlockElement(options[i]).getValue();
+                optionScores[i] = this.getMap().getBlockElement(options[i]).getValue();
+                if(optionScores[i] != Element.VOID.getValue()){
+                    potential++;
+                }
             }
         }
         // holds index for the next move chosen (0=north,...)
@@ -72,8 +71,8 @@ public class Snake extends Entity implements Utilities{
 
         // [tail] if snake moves forward move tail
         if(potential == 0){
-            if(super.getMap().getBlockColor(body.getFirst()) == this.getColor()){
-                super.getMap().setBlock(body.getFirst(), Color.LIGHT_GRAY, Element.VOID);
+            if(this.getMap().getBlockColor(body.getFirst()) == this.getColor()){
+                this.getMap().setBlock(body.getFirst(), Color.LIGHT_GRAY, Element.VOID);
             }
             body.removeFirst();   
         }
@@ -83,13 +82,13 @@ public class Snake extends Entity implements Utilities{
             potential--;
         }
 
-        // [head] 
+        // [head] add the new head block to the snake body
         body.add(options[bestMove]);
-        super.setMainBlock(options[bestMove]);
-        super.getMap().setBlock(options[bestMove], super.getColor(), Element.SNAKE);
+        this.setMainBlock(options[bestMove]);
+        this.getMap().setBlock(options[bestMove], this.getColor(), Element.SNAKE);
         
         // if the code runs in low delay head and tail point to same block after self-bite
-        // python too fast? quick!! call stackoverflow!!
+        // python too fast??? quick!! call stackoverflow!!
         if(body.getFirst() == body.getLast()){
             body.removeFirst();
         }
@@ -98,17 +97,26 @@ public class Snake extends Entity implements Utilities{
         return bestMove;
     }
 
+    @Override
     public void bitten(Point p){
         int temp = body.indexOf(p);
-        for(int i=0; i<temp+1; i++){
-            // remove tail block from map (set void) but check if the block is not overwritten by something else first (check if self color) just in case
-            if(super.getMap().getBlockColor(p) == this.getColor()){
-                super.getMap().setBlock(body.get(i), Color.LIGHT_GRAY, Element.VOID);
-            }
-            body.removeFirst();
-            length--;
+        // if head of snake is bitten (dead)
+        if(temp == length-1){
+            System.out.print(this.getColor() + " snake has been eaten.. ");
+            super.bitten(p);
         }
-
+        // some of snake remains
+        else{
+            System.out.println(this.getColor() + " snake has been bitten");
+            for(int i=0; i<temp+1; i++){
+                // remove tail block from map (set void) but check if the block is not overwritten by something else first (check if self color) just in case
+                if(this.getMap().getBlockColor(p) == this.getColor()){
+                    this.getMap().setBlock(body.get(i), Color.LIGHT_GRAY, Element.VOID);
+                }
+                body.removeFirst();
+                length--;
+            }
+        }
     }
 
     public int findBestDirection(int[] optionScores){
@@ -142,8 +150,9 @@ public class Snake extends Entity implements Utilities{
     public String getheadDir(){ return headDir;}
     public int getPotential(){ return potential;}
 
+    @Override
     public String toString(){
-        return "Snake: \nlength: " + length + ", color: " + super.getExists() + "\nbody: " + body + "\n";
+        return "Snake: \nlength: " + length + ", color: " + this.getColor() + "\nbody: " + body + "\n";
     }
 }
 

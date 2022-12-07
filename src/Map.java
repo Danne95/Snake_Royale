@@ -35,6 +35,11 @@ public class Map {
         }
     }
 
+    public void placeApple(Apple apple){
+        Point temp = apple.getMainBlock();
+        grid[temp.getx()][temp.gety()].updateBlock(apple.getColor(), Element.APPLE);
+    }
+
     public void setBlock(Point p, Color color, Element element){
         grid[p.getx()][p.gety()].updateBlock(color, element);
     }
