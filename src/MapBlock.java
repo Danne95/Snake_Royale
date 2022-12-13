@@ -3,29 +3,34 @@ import java.awt.Color;
 
 public class MapBlock extends JLabel {
     private Point point;
-    private Color color;
-    private Element element;
+    private Entity entity;
 
     // ctor
-    public MapBlock(Point point, Color color){
+    public MapBlock(Point point){
         super();
         this.point = point;
-        this.element = Element.VOID;
-        this.updateBlock(color, Element.VOID);
+        this.updateBlock(null, Element.VOID);
+        this.entity = null;
     }
 
     // ctor
-    public MapBlock(int row, int col, Color color){
+    public MapBlock(int row, int col){
         super();
         this.point = new Point(row, col);
-        this.element = Element.VOID;
-        this.updateBlock(color, Element.VOID);
+        this.updateBlock(null, Element.VOID);
     }
 
-    public void updateBlock(Color color, Element element){
-        this.color = color;
-        this.element = element;
-        super.setBackground(color);
+    public void updateBlock(Entity entity, Element element){
+        this.entity = entity;
+        if(element == Element.VOID){
+            super.setBackground(Color.LIGHT_GRAY);
+        }
+        else if(element == Element.SNAKE_REMAINS){
+            super.setBackground(this.getBackground().darker().darker());
+        }
+        else{
+            super.setBackground(entity.getColor());
+        }
     }
 
     public void setPoint(int i, int j){
@@ -37,12 +42,25 @@ public class MapBlock extends JLabel {
         this.point = point;
     }
 
+    public Element getElement(){
+        if(entity == null){
+            if(this.getBackground() == Color.LIGHT_GRAY){
+                return Element.VOID;
+            }
+            else{
+                return Element.SNAKE_REMAINS;
+            }
+        }
+        else{
+            return entity.getElement();
+        }
+    }
+    public Color getColor(){ return this.getBackground();}
     public int getRow(){ return point.getx();}
     public int getCol(){ return point.gety();}
-    public Color getColor(){ return color;}
-    public Element getElement(){ return element;}
+    public Entity getEntity(){ return entity;}
 
     public String toString(){
-        return color.toString();
+        return " " + point + " " + entity + " ";
     }
 }

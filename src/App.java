@@ -25,8 +25,9 @@ public class App    {
     public static void main(String[] args) throws Exception {
         System.out.println("\t\t\t\t\t\t\t\t\t***Hello, Welcome to 'App.java!'***");
         App app = new App();
-        Game game = new Game(app, 10, 1);
-        game.start(150, 69);
+        Game game = new Game(app, 21, 1);
+        game.start(420, 1);
+        game.summary();
         System.out.println("\t\t\t\t\t\t\t\t\t\t***end of 'App.java!'***");
     }
 
