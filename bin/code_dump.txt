@@ -42,3 +42,204 @@
         potential +=1;
         nextHead = currHead;
     }
+
+
+// before threading
+    public void start(int turns, int delay){
+        Point contestedBlock;
+        for(int i=0; i<turns; i++){
+            System.out.println("\nturn " + i + ": ");
+            for(int j=0; j<snakes.size(); j++){
+                Snake temp = snakes.get(j);
+                try{
+                    Thread.sleep(delay);
+                }catch (InterruptedException ie){}
+
+                // snake moved to this point
+                try{
+                    contestedBlock = temp.move();
+                    if(contestedBlock != null){
+                        System.out.println(temp.getColor() + " movement conflicts at " + contestedBlock); 
+                        findVictim(contestedBlock, temp);
+                    }
+                }catch (NoSuchElementException nsee){
+                    //trying to catch a mysterious "phantom snake" with no body(bug), 
+                    //that exists only to bring chaos and crush my code!
+                    summary();
+                    System.exit(1);
+                }
+                
+            }
+        }
+        System.out.println("\nout of turns...\n\n\n\n\n");
+    }
+
+    // handle refresh of new block for other entity
+    public void findVictim(Point point, Snake attacker){
+        boolean dead;
+        Entity temp = null;
+
+        // check apples
+        for(int i=0; i<apples.size(); i++){
+            temp = apples.get(i);
+            if(temp.contains(point)){
+                dead = temp.bitten(point);
+                if(dead){
+                    attacker.addTitle(appleTitle());
+                    shadowRealm.add(apples.remove(i));
+                }
+                return;
+            }
+        }
+
+        // check snakes if no apple was bitten
+        for(int i=0; i<snakes.size(); i++){
+            temp = snakes.get(i);
+            if(temp.getColor() != attacker.getColor() && temp.contains(point)){
+                dead = temp.bitten(point);
+                if(dead){
+                    attacker.addTitle(snakeTitle());
+                    shadowRealm.add(snakes.remove(i));
+                }
+                return;
+            }
+        }
+    }
+
+
+// redoing snake .move and .findBestDirection
+    public Point move(){
+        // "phantom snake" with no body(bug) will go in here
+        if(body == null){
+            throw new NoSuchElementException();
+        }
+        Point currHead = body.getLast();
+        int x = currHead.getx();
+        int y = currHead.gety();
+        int mapSize = this.getMap().getMapSize();
+        Point options[] = new Point[4]; // N,E,S,W
+        int optionScores[] = new int[4];
+
+        // handles a bug of a dead snake not realizing its dead yet
+        if(this.getAlive() == false){
+            return null;
+        }
+
+        // potential points to move to
+        options[0] = new Point((x+mapSize-1)% mapSize, y);      // north
+        options[1] = new Point(x, (y+1)% mapSize);              // east
+        options[2] = new Point((x+1)% mapSize, y);              // south
+        options[3] = new Point(x, (y+mapSize-1)% mapSize);      // west
+
+        // values for move options
+        for(int i=0; i<4 ;i++){
+            // check if detected snake is self, if true, give score in relation to segment index
+            if(this.contains(options[i])){
+                optionScores[i] = - (body.indexOf(options[i])+10) ; //+1 is the correct value, but doesnt matter 
+            }
+            // not self
+            else{
+                optionScores[i] = this.getMap().getBlockElement(options[i]).getValue();
+            }
+        }
+        // holds index for the next move chosen (0=north,...)
+        int bestMove = findBestDirection(optionScores);
+
+        // if snake bites itself
+        if(optionScores[bestMove] < 0){
+            System.out.println("\t" + options[bestMove] + " selfbite");
+            bitten(options[bestMove]);
+        }
+        // else add to snake the potential he ate
+        else{
+            this.potential += optionScores[bestMove]-Element.VOID.getValue();
+        }
+
+        // [tail] if snake moves forward move tail
+        if(potential == 0){
+            if(this.getMap().getBlockColor(body.getFirst()) == this.getColor()){
+                this.getMap().setBlock(body.getFirst(), null, Element.VOID);
+            }
+            body.removeFirst();   
+        }
+        // [tail] snake grows its tail (tail remains in place)
+        else{
+            length++;
+            potential--;
+        }
+
+        // [head] add the new head block to the snake body
+        body.add(options[bestMove]);
+        this.setMainBlock(options[bestMove]);
+        this.getMap().setBlock(options[bestMove], this, Element.SNAKE);
+        
+        // if the code runs in low delay head and tail point to same block after self-bite
+        // python too fast??? quick!! call stackoverflow!!
+        if(body.getFirst().equals(body.getLast())){
+            body.removeFirst();
+        }
+
+        // return point to handle only if impacted a different entity
+        if (optionScores[bestMove] == Element.APPLE.getValue() || optionScores[bestMove] == Element.SNAKE.getValue()){
+            return options[bestMove];
+        }
+        // self, void or snake_remains
+        else{
+            return null;
+        }
+    }
+
+    public int findBestDirection(int[] optionScores){
+        int maxValue = -(this.length + Element.maxValue()); // will hold the highest value from options
+        List<Integer> maxIndexes = new ArrayList<>(); // holds indexes (0=north,...)
+        for(int i=0; i<4; i++){
+            if(optionScores[i] == maxValue){
+                maxIndexes.add(i);
+            }
+            else if(optionScores[i] > maxValue){
+                maxIndexes.clear();
+                maxIndexes.add(i);
+                maxValue = optionScores[i];
+            }
+        }
+        if(maxValue<1){
+            System.out.println(" options: " + optionScores[0] + " " + optionScores[1] + " " + optionScores[2] + " " + optionScores[3] + " " + "\tchosen " + maxValue + " ");
+        }
+        // if there are multiple best options, get a random one
+        int randChoice = getRandomInt(0, maxIndexes.size());
+        return maxIndexes.get(randChoice);
+    }
+
+
+    // handle refresh of new block for other entity
+    public void findVictim(Point point, Snake attacker){
+        boolean dead;
+        Entity temp = null;
+
+        // check apples
+        for(int i=0; i<apples.size(); i++){
+            temp = apples.get(i);
+            if(temp.contains(point)){
+                dead = temp.bitten(point);
+                if(dead){
+                    attacker.addTitle(appleTitle());
+                    shadowRealm.add(apples.remove(i));
+                }
+                return;
+            }
+        }
+
+        // check snakes if no apple was bitten
+        for(int i=0; i<snakes.size(); i++){
+            temp = snakes.get(i);
+            // self bites are handled inside move already, beacuse of easier logic
+            if(temp.getColor() != attacker.getColor() && temp.contains(point)){
+                dead = temp.bitten(point);
+                if(dead){
+                    attacker.addTitle(snakeTitle());
+                    shadowRealm.add(snakes.remove(i));
+                }
+                return;
+            }
+        }
+    }

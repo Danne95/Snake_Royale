@@ -55,7 +55,9 @@ public class MapBlock extends JLabel {
             return entity.getElement();
         }
     }
+
     public Color getColor(){ return this.getBackground();}
+    public Point gePoint(){ return this.point;}
     public int getRow(){ return point.getx();}
     public int getCol(){ return point.gety();}
     public Entity getEntity(){ return entity;}

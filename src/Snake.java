@@ -1,9 +1,10 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.awt.Color;
 
-public class Snake extends Entity implements Utilities{
+public class Snake extends Entity{
     private int length;
     private String headDir;
     private LinkedList<Point> body; //(head of snake is last block)
@@ -38,27 +39,37 @@ public class Snake extends Entity implements Utilities{
         map.placeSnake(this);
     }
 
-    public Point move(){
-        System.out.println("-1--------------------------------------");
-        System.out.println(this);
-        System.out.println("-2--------------------------------------");
-        System.out.println(this.body);
-        System.out.println("-3--------------------------------------");
-        System.out.println(this.getBody());
-        System.out.println("-4--------------------------------------");
-        System.out.println();this.getAlive();
-        System.out.println("-5--------------------------------------");
-        Point currHead = body.getLast();
-        int x = currHead.getx();
-        int y = currHead.gety();
-        int mapSize = this.getMap().getMapSize();
-        Point options[] = new Point[4]; // N,E,S,W
-        int optionScores[] = new int[4];
+    @Override
+    //thread function
+    public void run(){
+        Point nextPoint = bestMove();
+        move(nextPoint);
+        Entity victim = this.getMap().getBlockEntity(nextPoint);
+        if(victim != null){
+            victim.bitten(nextPoint);
+        }
+    }
+
+    public Point bestMove(){
+        // "phantom snake" with no body(bug) will go in here
+        if(body == null){
+            //consider triggering 'bitten' to kill it?
+            throw new NoSuchElementException();
+        }
 
         // handles a bug of a dead snake not realizing its dead yet
         if(this.getAlive() == false){
             return null;
         }
+
+        int mapSize = this.getMap().getMapSize();
+        Point options[] = new Point[4]; // N,E,S,W
+        List<Integer> bestIndexes = new ArrayList<>(); // holds indexes (0=north,...)
+        int maxValue = -(this.length + Element.maxValue()); // will hold the highest value from options
+        Point currHead = body.getLast();
+        int x = currHead.getx();
+        int y = currHead.gety();
+        int optionScore;
 
         // potential points to move to
         options[0] = new Point((x+mapSize-1)% mapSize, y);      // north
@@ -67,89 +78,79 @@ public class Snake extends Entity implements Utilities{
         options[3] = new Point(x, (y+mapSize-1)% mapSize);      // west
 
         // values for move options
-        for(int i=0; i<4 ;i++){
+        for(int i=0; i<4 ; i++){
             // check if detected snake is self, if true, give score in relation to segment index
             if(this.contains(options[i])){
-                optionScores[i] = - (body.indexOf(options[i])+1) ;
+                optionScore = - (body.indexOf(options[i])+10);
             }
             // not self
             else{
-                optionScores[i] = this.getMap().getBlockElement(options[i]).getValue();
+                optionScore = this.getMap().getBlockElement(options[i]).getValue();
+            }
+
+            if(optionScore == maxValue){
+                bestIndexes.add(i);
+            }
+            else if(optionScore > maxValue){
+                bestIndexes.clear();
+                bestIndexes.add(i);
+                maxValue = optionScore;
             }
         }
-        // holds index for the next move chosen (0=north,...)
-        int bestMove = findBestDirection(optionScores);
-
-        // if snake bites itself
-        if(optionScores[bestMove] < 0){
-            System.out.println("\t" + options[bestMove] + " selfbite");
-            bitten(options[bestMove]);
-        }
-        // else add to snake the potential he ate
-        else{
-            this.potential += optionScores[bestMove]-Element.VOID.getValue();
-        }
-
-        // [tail] if snake moves forward move tail
-        if(potential == 0){
-            if(this.getMap().getBlockColor(body.getFirst()) == this.getColor()){
-                this.getMap().setBlock(body.getFirst(), null, Element.VOID);
+        // the only option is self bite
+        if(maxValue<0){
+            System.out.print("the only option is self bite, \tOptions: [");
+            for(int i=0; i<bestIndexes.size(); i++){
+                System.out.print(options[bestIndexes.get(i)]+ " ");
             }
-            body.removeFirst();   
-        }
-        // [tail] snake grows its tail (tail remains in place)
-        else{
-            length++;
-            potential--;
+            System.out.print("\tchosen " + maxValue + " \n");
         }
 
-        // [head] add the new head block to the snake body
-        body.add(options[bestMove]);
-        this.setMainBlock(options[bestMove]);
-        this.getMap().setBlock(options[bestMove], this, Element.SNAKE);
-        
-        // if the code runs in low delay head and tail point to same block after self-bite
-        // python too fast??? quick!! call stackoverflow!!
-        if(body.getFirst().equals(body.getLast())){
-            body.removeFirst();
-        }
-
-        // return point to handle only if impacted a different entity
-        if (optionScores[bestMove] == Element.APPLE.getValue() || optionScores[bestMove] == Element.SNAKE.getValue()){
-            return options[bestMove];
-        }
-        // self, void or snake_remains
-        else{
-            return null;
-        }
+        // if there are multiple best options, get a random one
+        int randChoice = getRandomInt(0, bestIndexes.size());
+        return options[bestIndexes.get(randChoice)];
     }
 
-    @Override
-    public boolean bitten(Point p){
-        int temp = body.indexOf(p);
-        boolean dead = false;
-        System.out.println("handling a bite " + p + " to " + body);
-        // if head of snake is bitten (dead)
-        if(p.equals(body.getLast())){
-            System.out.println("Friendly Fire!!");
-            dead = super.bitten(p);
+    public Entity move(Point choice){
+        // "phantom snake" with no body(bug) will go in here
+        if(body == null){
+            //consider triggering 'bitten' to kill it?
+            throw new NoSuchElementException();
         }
-        // handle bitten parts
-        for(int i=0; i<temp+1; i++){
-            // set as snake_remains element, but check if the block is not overwritten by something else first (check if self color) just in case
-            if(this.getMap().getBlockColor(body.getFirst()) == this.getColor()){
-                try{
-                    this.getMap().setBlock(body.getFirst(), null, Element.SNAKE_REMAINS);
+
+        // handles a bug of a dead snake not realizing its dead yet
+        if(this.getAlive() == false){
+            return null;
+        }
+
+        Entity currEntity = this.getMap().getBlockEntity(choice); 
+
+        // self-bite
+        if(this.contains(choice)){
+            System.out.println("\t" + choice + " selfbite");
+        }
+        // the move is not a self-bite
+        else{
+            this.potential += this.getMap().getBlockElement(choice).getValue();
+            // snake don't have potential to grow yet, so the tail moves forward
+            if(potential == 0){
+                if(this.getMap().getBlockColor(body.getFirst()) == this.getColor()){
+                    this.getMap().setBlock(body.getFirst(), null, Element.VOID);
                 }
-                catch (IndexOutOfBoundsException Ioobe){
-                    System.out.print("\n\n@@@@@@@@@@@IndexOutOfBoundsException@@@@@@@@@@@" + body + body.size() + "\n" + i);
-                    System.exit(1);
-                }
+            body.removeFirst();  
             }
-            body.removeFirst();
-            length--;
+            // snake uses his potential and grows
+            else{
+                length++;
+                potential--;
+            }
         }
-        return dead;
+
+        body.add(choice);
+        this.setMainBlock(choice);
+        this.getMap().setBlock(choice, this, Element.SNAKE);
+
+        return currEntity;
     }
 
     public int findBestDirection(int[] optionScores){
@@ -173,6 +174,41 @@ public class Snake extends Entity implements Utilities{
         return maxIndexes.get(randChoice);
     }
     
+    @Override
+    public boolean bitten(Point p){
+        int temp = body.indexOf(p);
+        boolean dead = false;
+        System.out.println("handling a bite " + p + " to " + body);
+
+        // if head of snake is bitten (dead)
+        if(temp == this.length-1){
+            System.out.println("Friendly Fire!!");
+            dead = super.bitten(p);
+        }
+
+        // if self-bite (not bitten the head but the head is now on bitten point), dont erase head that moved to poing 'p'
+        else if(temp != this.length-1 && p.equals(body.getLast())){
+            temp--;
+        }
+        
+        // handle bitten parts
+        for(int i=0; i<temp+1; i++){
+            // set as snake_remains element, but check if the block is not overwritten by something else first (check if self color) just in case
+            if(this.getMap().getBlockColor(body.getFirst()) == this.getColor()){
+                try{
+                    this.getMap().setBlock(body.getFirst(), null, Element.SNAKE_REMAINS);
+                }
+                catch (IndexOutOfBoundsException Ioobe){
+                    System.out.print("\n\n@@@@@@@@@@@IndexOutOfBoundsException@@@@@@@@@@@" + body + body.size() + "\n" + i);
+                    System.exit(1);
+                }
+            }
+            body.removeFirst();
+            length--;
+        }
+        return dead;
+    }
+
     public void addTitle(String s){ this.titles += s;}
     public void changeLength(int delta){ this.length += delta;}
     public void setheadDir(String dir){ this.headDir = dir;}

@@ -11,11 +11,15 @@ public interface Utilities {
 		return new Random().nextInt(maximum-minimum)+minimum;
 	}
 
-	public default String appleTitle() {
-		return " ####";
-	}
-
-	public default String snakeTitle() {
-		return " @@@@";
+	public default String newTitle(Element el){
+		if(el == Element.APPLE){
+			return ", eater of apple";
+		}
+		else if(el == Element.SNAKE){
+			return ", slayer of snake";
+		}		
+		else{
+			return " ?";
+		}
 	}
 }

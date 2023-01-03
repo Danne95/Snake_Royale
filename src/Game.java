@@ -1,19 +1,18 @@
 import java.awt.Color;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 public class Game implements Utilities{
     private Map map;
     //private LinkedList<Entity> entities;
     private LinkedList<Snake> snakes;
     private LinkedList<Entity> apples;
-    private LinkedList<Entity> shadowRealm;
 
     public Game(App app, int mapSize, int snakeAmount){
         System.out.println("building game...");
         //entities = new LinkedList<Entity>();
         snakes = new LinkedList<Snake>();
         apples = new LinkedList<Entity>();
-        shadowRealm = new LinkedList<Entity>();
 
         // map
         map = new Map(app, mapSize);
@@ -23,7 +22,7 @@ public class Game implements Utilities{
         int[] s1ys = {1,2,3,3,4,4,5,6,6,7};
         Snake snake1 = new Snake(app, Color.GREEN.darker(), s1xs, s1ys, "east", map);
         snakes.add(snake1);
-
+        
         // snake2
         int[] s2xs = {1,1,1,2,2,3,3,3,4,4};
         int[] s2ys = {mapSize-2,mapSize-3,mapSize-4,mapSize-4,mapSize-5,mapSize-5,mapSize-6,mapSize-7,mapSize-7,mapSize-8};
@@ -95,54 +94,39 @@ public class Game implements Utilities{
 
     public void start(int turns, int delay){
         Point contestedBlock;
+        Entity victim;
+        boolean dead;
         for(int i=0; i<turns; i++){
             System.out.println("\nturn " + i + ": ");
             for(int j=0; j<snakes.size(); j++){
-                Snake temp = snakes.get(j);
-                try{
-                    Thread.sleep(delay);
-                }catch (InterruptedException ie){}
-                // snake moved to this point
-                contestedBlock = temp.move();
-                if(contestedBlock != null){
-                    System.out.println(temp.getColor() + " movement conflicts at " + contestedBlock); 
-                    findVictim(contestedBlock, temp);
+                Snake snakeJ = snakes.get(j);
+                if(snakeJ.getAlive()){
+                    try{
+                        Thread.sleep(delay);
+                    }catch (InterruptedException ie){}
+
+                    // snake moved to this point
+                    try{
+                        contestedBlock = snakeJ.bestMove();
+                        System.out.println("\tbestmove: " + contestedBlock);
+                        victim = snakeJ.move(contestedBlock);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                        if(victim != null){
+                            System.out.println("\tvictim:" + victim.getColor());
+                            System.out.println(snakeJ.getColor() + " attacks " + victim.getColor() + " \tmovement conflicts at " + contestedBlock); 
+                            dead = victim.bitten(contestedBlock);
+                            if(dead){
+                                snakeJ.addTitle(newTitle(victim.getElement()));
+                            }
+                        }
+                    }catch (NoSuchElementException nsee){
+                        //trying to catch a mysterious "phantom snake" with no body(bug), 
+                        summary();
+                        System.exit(1);
+                    }
                 }
             }
         }
         System.out.println("\nout of turns...\n\n\n\n\n");
-    }
-
-    // handle refresh of new block for other entity
-    public void findVictim(Point point, Snake attacker){
-        boolean dead;
-        Entity temp = null;
-
-        // check apples
-        for(int i=0; i<apples.size(); i++){
-            temp = apples.get(i);
-            if(temp.contains(point)){
-                dead = temp.bitten(point);
-                if(dead){
-                    attacker.addTitle(appleTitle());
-                    shadowRealm.add(apples.remove(i));
-                }
-                return;
-            }
-        }
-
-        // check snakes if no apple was bitten
-        for(int i=0; i<snakes.size(); i++){
-            temp = snakes.get(i);
-            if(temp.getColor() != attacker.getColor() && temp.contains(point)){
-                dead = temp.bitten(point);
-                if(dead){
-                    attacker.addTitle(snakeTitle());
-                    shadowRealm.add(snakes.remove(i));
-                }
-                return;
-            }
-        }
     }
 
     // so how is everyone doing in the end?:
@@ -150,19 +134,14 @@ public class Game implements Utilities{
         System.out.println  ("\n\n\n\n--------------------------------------------------------------------");
         System.out.println          ("--------------------------end game summary--------------------------\n\n");
         
-        System.out.println("snakes alive: ");
+        System.out.println("snakes: ");
         for(int i=0; i<snakes.size(); i++){
             System.out.println(snakes.get(i) + snakes.get(i).getTitles() + "\n");
         }
 
-        System.out.println("\n\napples alive: ");
+        System.out.println("\n\napples: ");
         for(int i=0; i<apples.size(); i++){
             System.out.println(apples.get(i));
-        }
-
-        System.out.println("\n\nthose who died: ");
-        for(int i=0; i<shadowRealm.size(); i++){
-            System.out.println(shadowRealm.get(i));
         }
     }
 }

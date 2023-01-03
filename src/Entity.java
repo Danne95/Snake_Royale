@@ -1,6 +1,6 @@
 import java.awt.Color;
 
-public abstract class Entity {
+public abstract class Entity extends Thread implements Utilities {
     private Element element;
     private Color color;
     private Point mainBlock;
@@ -30,6 +30,7 @@ public abstract class Entity {
     public Map getMap(){ return map;}
     public boolean getAlive(){ return alive;}
 
+    @Override
     public String toString(){
         return "main block: " + mainBlock + ", color: " + color + ", alive: " + alive;
     }

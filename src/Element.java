@@ -1,7 +1,7 @@
 public enum Element {
-    VOID(0),
-    SNAKE(-1),
-    SNAKE_REMAINS(5),
+    VOID(1),
+    SNAKE(1),
+    SNAKE_REMAINS(2),
     APPLE(10);
 
 
