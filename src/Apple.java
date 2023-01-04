@@ -9,11 +9,6 @@ public class Apple extends Entity{
     }
 
     @Override
-    public void run(){
-        
-    }
-
-    @Override
     public boolean bitten(Point p){
         System.out.println("apple has been consumed.. ");
         return super.bitten(p);

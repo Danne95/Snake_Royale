@@ -1,6 +1,6 @@
 import java.awt.Color;
 
-public abstract class Entity extends Thread implements Utilities {
+public abstract class Entity implements Utilities {
     private Element element;
     private Color color;
     private Point mainBlock;

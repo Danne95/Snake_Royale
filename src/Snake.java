@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.awt.Color;
 
-public class Snake extends Entity{
+public class Snake extends Entity implements Runnable{
     private int length;
     private String headDir;
     private LinkedList<Point> body; //(head of snake is last block)
@@ -42,12 +42,9 @@ public class Snake extends Entity{
     @Override
     //thread function
     public void run(){
-        Point nextPoint = bestMove();
-        move(nextPoint);
-        Entity victim = this.getMap().getBlockEntity(nextPoint);
-        if(victim != null){
-            victim.bitten(nextPoint);
-        }
+        Point contestedBlock = bestMove();
+        System.out.println("\tbestmove: " + contestedBlock);
+        move(contestedBlock);
     }
 
     public Point bestMove(){
@@ -111,7 +108,7 @@ public class Snake extends Entity{
         return options[bestIndexes.get(randChoice)];
     }
 
-    public Entity move(Point choice){
+    public void move(Point choice){
         // "phantom snake" with no body(bug) will go in here
         if(body == null){
             //consider triggering 'bitten' to kill it?
@@ -120,10 +117,11 @@ public class Snake extends Entity{
 
         // handles a bug of a dead snake not realizing its dead yet
         if(this.getAlive() == false){
-            return null;
+            return;
         }
 
-        Entity currEntity = this.getMap().getBlockEntity(choice); 
+        Entity victim = this.getMap().getBlockEntity(choice); 
+        boolean dead;
 
         // self-bite
         if(this.contains(choice)){
@@ -150,7 +148,14 @@ public class Snake extends Entity{
         this.setMainBlock(choice);
         this.getMap().setBlock(choice, this, Element.SNAKE);
 
-        return currEntity;
+        if(victim != null){
+            System.out.println("\tvictim:" + victim.getColor());
+            System.out.println(this.getColor() + " attacks " + victim.getColor() + " \tmovement conflicts at " + choice); 
+            dead = victim.bitten(choice);
+            if(dead){
+                this.addTitle(newTitle(victim.getElement()));
+            }
+        }
     }
 
     public int findBestDirection(int[] optionScores){

@@ -93,9 +93,7 @@ public class Game implements Utilities{
     }
 
     public void start(int turns, int delay){
-        Point contestedBlock;
-        Entity victim;
-        boolean dead;
+        //Point contestedBlock;
         for(int i=0; i<turns; i++){
             System.out.println("\nturn " + i + ": ");
             for(int j=0; j<snakes.size(); j++){
@@ -104,20 +102,15 @@ public class Game implements Utilities{
                     try{
                         Thread.sleep(delay);
                     }catch (InterruptedException ie){}
-
                     // snake moved to this point
                     try{
+                        Thread thread = new Thread(snakeJ);
+                        thread.start();
+                        /*
                         contestedBlock = snakeJ.bestMove();
                         System.out.println("\tbestmove: " + contestedBlock);
-                        victim = snakeJ.move(contestedBlock);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                        if(victim != null){
-                            System.out.println("\tvictim:" + victim.getColor());
-                            System.out.println(snakeJ.getColor() + " attacks " + victim.getColor() + " \tmovement conflicts at " + contestedBlock); 
-                            dead = victim.bitten(contestedBlock);
-                            if(dead){
-                                snakeJ.addTitle(newTitle(victim.getElement()));
-                            }
-                        }
+                        snakeJ.move(contestedBlock);
+                        */
                     }catch (NoSuchElementException nsee){
                         //trying to catch a mysterious "phantom snake" with no body(bug), 
                         summary();

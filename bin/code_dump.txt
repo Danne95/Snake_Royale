@@ -243,3 +243,14 @@
             }
         }
     }
+
+
+
+    if(victim != null){
+                            System.out.println("\tvictim:" + victim.getColor());
+                            System.out.println(snakeJ.getColor() + " attacks " + victim.getColor() + " \tmovement conflicts at " + contestedBlock); 
+                            dead = victim.bitten(contestedBlock);
+                            if(dead){
+                                snakeJ.addTitle(newTitle(victim.getElement()));
+                            }
+                        }
